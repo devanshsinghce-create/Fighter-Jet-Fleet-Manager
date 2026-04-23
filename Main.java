@@ -1,76 +1,55 @@
-public class Jet {
+public class Main {
 
-    // Possible states of a jet
-    public enum Status {
-        READY, AIRBORNE, MAINTENANCE
+    public static void main(String[] args) {
+
+        // --- Create pilots ---
+        Pilot p1 = new Pilot("Maverick", 5);
+        Pilot p2 = new Pilot("Iceman", 4);
+        Pilot p3 = new Pilot("Rooster", 3);
+
+        // --- Create jets ---
+        Jet f22  = new Jet("F-22 Raptor", 80);
+        Jet f16  = new Jet("F-16 Falcon", 15); // low fuel on purpose
+        Jet su57 = new Jet("Su-57 Felon", 60);
+
+        // --- Set up fleet manager ---
+        FleetManager manager = new FleetManager();
+        manager.addJet(f22);
+        manager.addJet(f16);
+        manager.addJet(su57);
+
+        System.out.println();
+
+        // --- Assign pilots ---
+        f22.assignPilot(p1);
+        f16.assignPilot(p2);
+        su57.assignPilot(p3);
+
+        // --- Show initial fleet ---
+        manager.showFleet();
+
+        // --- Try scrambling all jets ---
+        System.out.println("=== Scramble order! ===");
+        f22.scramble();   // should work
+        f16.scramble();   // should fail - low fuel
+        su57.scramble();  // should work
+
+        // --- Check readiness ---
+        System.out.println();
+        manager.checkReadiness();
+
+        // --- Refuel the F-16 and try again ---
+        System.out.println("\nRefueling F-16...");
+        f16.refuel();
+        f16.scramble(); // now it works
+
+        // --- Send F-22 for maintenance ---
+        System.out.println();
+        f22.land();
+        f22.sendForMaintenance();
+
+        // --- Final fleet state ---
+        manager.showFleet();
+        manager.checkReadiness();
     }
-
-    private String model;
-    private int fuel;        // fuel level 0–100
-    private Status status;
-    private Pilot pilot;     // can be null if no pilot assigned
-
-    public Jet(String model, int fuel) {
-        this.model = model;
-        this.fuel = fuel;
-        this.status = Status.READY;
-        this.pilot = null;
-    }
-
-    // Assign a pilot to this jet
-    public void assignPilot(Pilot pilot) {
-        this.pilot = pilot;
-        System.out.println("Pilot " + pilot.getName() + " assigned to " + model);
-    }
-
-    // Launch the jet into the air
-    public void scramble() {
-        if (status == Status.MAINTENANCE) {
-            System.out.println(model + " is under maintenance. Cannot scramble.");
-        } else if (fuel < 20) {
-            System.out.println(model + " has low fuel (" + fuel + "%). Refuel first!");
-        } else if (pilot == null) {
-            System.out.println(model + " has no pilot assigned!");
-        } else {
-            status = Status.AIRBORNE;
-            fuel -= 20; // flying uses fuel
-            System.out.println(model + " is now AIRBORNE. Fuel: " + fuel + "%");
-        }
-    }
-
-    // Land the jet
-    public void land() {
-        if (status == Status.AIRBORNE) {
-            status = Status.READY;
-            System.out.println(model + " has landed successfully.");
-        } else {
-            System.out.println(model + " is not in the air.");
-        }
-    }
-
-    // Refuel the jet
-    public void refuel() {
-        if (status == Status.AIRBORNE) {
-            System.out.println("Cannot refuel " + model + " while airborne!");
-        } else {
-            fuel = 100;
-            System.out.println(model + " refueled to 100%.");
-        }
-    }
-
-    // Send jet for maintenance
-    public void sendForMaintenance() {
-        status = Status.MAINTENANCE;
-        System.out.println(model + " sent for maintenance.");
-    }
-
-    // Print jet info
-    public void printInfo() {
-        String pilotName = (pilot != null) ? pilot.getName() : "None";
-        System.out.println("  [" + model + "] Status: " + status + " | Fuel: " + fuel + "% | Pilot: " + pilotName);
-    }
-
-    public String getModel()  { return model; }
-    public int getFuel()      { return fuel; }
-    public Status getStatus() { return status; }
 }
